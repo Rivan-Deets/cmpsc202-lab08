@@ -76,41 +76,47 @@ Trace Dijkstra's algorithm starting from Node $A$ to find the shortest path to N
 
 1. Which node does Dijkstra's algorithm visit first after $A$?
 
-   > Dijkstra's algorithm visits Node $B$ first because the distance from $A$ to $B$ is $2$, while the distance from $A$ to $C$ is $5$.
+   > Dijkstra compares the distances from $A$ to the unvisited nodes:
+   >
+   > $A \rightarrow B = 2$
+   >
+   > $A \rightarrow C = 1$
+   >
+   > Since $1$ is smaller than $2$, Dijkstra visits Node $C$ first.
 
 2. What will Dijkstra's algorithm declare as the shortest path to $C$, and what is its weight?
 
-   > After visiting $B$, the algorithm examines the edge from $B$ to $C$, which has weight $-4$.
+   > Dijkstra will declare that the shortest path is:
    >
-   > The path is:
+   > $A \rightarrow C$
+   >
+   > Its weight is $1$.
+
+3. Look at the graph manually. What is the *actual* shortest path from $A$ to $C$, and what is its total weight?
+
+   > The actual shortest path is:
    >
    > $A \rightarrow B \rightarrow C$
    >
    > Its total weight is:
    >
-   > $2 + (-4) = -2$
+   > $2 + (-5) = -3$
    >
-   > Therefore, Dijkstra's algorithm declares the shortest path to $C$ to have weight $-2$.
-
-3. Look at the graph manually. What is the *actual* shortest path from $A$ to $C$, and what is its total weight?
-
-   > The actual shortest path is also:
-   >
-   > $A \rightarrow B \rightarrow C$
-   >
-   > Its total weight is $-2$.
+   > Therefore, the actual shortest path has a weight of $-3$.
 
 4. **The Trap:** Explain exactly *why* Dijkstra's algorithm failed to find the correct shortest path in this scenario.
 
-   > With the graph and edge weights shown, Dijkstra's algorithm does not fail. The negative edge is encountered before Node $C$ is finalized, so the algorithm correctly updates the distance to $C$ from $5$ to $-2$.
+   > Dijkstra visits Node $C$ first because its current distance is $1$. Once Dijkstra visits a node, it assumes that the distance to that node is final.
    >
-   > This graph therefore does not demonstrate the usual failure of Dijkstra's algorithm with negative edge weights. Dijkstra's algorithm can fail when a node is finalized too early, before a later negative edge provides a shorter path to it.
+   > However, this assumption only works when all edge weights are nonnegative. The path through Node $B$ is actually shorter:
    >
-   > For example, if the edge weights from $A$ were changed so that $A \rightarrow B$ had weight $5$ and $A \rightarrow C$ had weight $2$, then Dijkstra's algorithm would visit $C$ first and finalize its distance as $2$. However, the path $A \rightarrow B \rightarrow C$ would have total weight:
+   > $A \rightarrow B \rightarrow C$
    >
-   > $5 + (-4) = 1$
+   > $2 + (-5) = -3$
    >
-   > In that modified graph, the algorithm would incorrectly keep the distance $2$ instead of finding the shorter distance $1$.
+   > Because $C$ was already marked as visited, Dijkstra does not properly reconsider it. It incorrectly keeps the distance $1$ instead of finding the correct distance $-3$.
+   >
+   > This is why Dijkstra's algorithm should not be used with negative edge weights. An algorithm such as Bellman-Ford should be used instead.
 
 ---
 
