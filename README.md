@@ -1,6 +1,6 @@
 # Lab 08: Navigating Weighted Graphs with Dijkstra's Algorithm
 
-Name(s): _______________________  
+Name(s): _____Rivan__________________
 
 ## Introduction
 You are already familiar with Breadth-First Search (BFS) and Depth-First Search (DFS) for exploring graphs. However, what happens when all edges are not created equal? In this lab, we will explore Dijkstra's Algorithm, which allows us to find the shortest path between two vertices in a *weighted* graph.
@@ -14,14 +14,24 @@ BFS is excellent for finding the shortest path in an unweighted graph. Let's see
 ![Part 1 Graph](./part1.png)
 
 **Questions:**
-1. If you run a standard BFS starting at Node $A$, looking for Node $D$, which path will the BFS algorithm discover first? Why?
-   > *Your answer here*
 
-2. What is the total weight of the path BFS found? What is the total weight of the alternative path? 
-   > *Your answer here*
+1. If you run a standard BFS starting at Node $A$, looking for Node $D$, which path will the BFS algorithm discover first? Why?
+
+   > BFS will discover the path $A \rightarrow D$ first because $D$ is a direct neighbor of $A$. BFS prioritizes the path with the fewest number of edges, not the path with the lowest total weight.
+
+2. What is the total weight of the path BFS found? What is the total weight of the alternative path?
+
+   > The BFS path is $A \rightarrow D$, with a total weight of $100$.
+   >
+   > The alternative path is $A \rightarrow B \rightarrow C \rightarrow D$, with a total weight of:
+   >
+   > $2 + 3 + 4 = 9$
+   >
+   > Therefore, the alternative path has a much smaller total weight.
 
 3. How does the definition of "shortest path" change when moving from unweighted graphs to weighted graphs?
-   > *Your answer here*
+
+   > In an unweighted graph, the shortest path is the path with the fewest edges. In a weighted graph, the shortest path is the path with the smallest sum of edge weights, even if it contains more edges.
 
 ---
 
@@ -32,23 +42,26 @@ Dijkstra's algorithm uses a greedy approach. It maintains a set of "visited" (fi
 ![Part 2 Graph](./part2.png)
 
 **Instructions:**
-Starting at Node $A$, trace Dijkstra's algorithm. Fill in the tracker table below. 
+Starting at Node $A$, trace Dijkstra's algorithm. Fill in the tracker table below.
+
 *   **Current Node:** The unvisited node with the smallest current distance.
 *   **Neighbors to Check:** The neighbors of the current node whose distances might need updating.
 *   **`dist` Array:** The current known shortest distance from $A$ to each node. Use $\infty$ for unreachable/unknown nodes.
 *   **`visited` Set:** The set of nodes that have been finalized and whose shortest distances are known.
 
-| Step | Current Node | Neighbors to Check | `dist` Map | `visited` Set | 
-| :--- | :--- | :--- | :--- | :--- | 
-| 0 | $A$ | $B$, $C$ | $A$:0, $B$:4, $C$:2 | { } | 
-| 1 | | | | | 
-| 2 | | | | | 
-| 3 | | | | | 
-| 4 | | | | | 
+| Step | Current Node | Neighbors to Check | `dist` Map | `visited` Set |
+| :--- | :--- | :--- | :--- | :--- |
+| 0 | $A$ | $B$, $C$ | $A$:0, $B$:4, $C$:2, $D$:$\infty$, $E$:$\infty$ | { } |
+| 1 | $C$ | $A$, $B$, $D$, $E$ | $A$:0, $B$:3, $C$:2, $D$:10, $E$:12 | {$C$} |
+| 2 | $B$ | $A$, $C$, $D$ | $A$:0, $B$:3, $C$:2, $D$:8, $E$:12 | {$C$, $B$} |
+| 3 | $D$ | $B$, $C$, $E$ | $A$:0, $B$:3, $C$:2, $D$:8, $E$:10 | {$C$, $B$, $D$} |
+| 4 | $E$ | $C$, $D$ | $A$:0, $B$:3, $C$:2, $D$:8, $E$:10 | {$C$, $B$, $D$, $E$} |
 
 **Conceptual Question:**
-When we add a vertex to the "visited" set, why are we 100% certain we have found the absolute shortest path to that node? 
-> *Your answer here*
+
+When we add a vertex to the "visited" set, why are we 100% certain we have found the absolute shortest path to that node?
+
+> Because Dijkstra's algorithm always selects the unvisited node with the smallest known distance. Since all edge weights are nonnegative, any other path to that node would have to pass through an unvisited node with an equal or greater distance. Adding more nonnegative edge weights cannot produce a shorter path, so the selected distance is final.
 
 ---
 
@@ -62,16 +75,42 @@ Dijkstra's algorithm relies on an assumption about the weights. Let's see what h
 Trace Dijkstra's algorithm starting from Node $A$ to find the shortest path to Node $C$.
 
 1. Which node does Dijkstra's algorithm visit first after $A$?
-   > *Your answer here*
+
+   > Dijkstra's algorithm visits Node $B$ first because the distance from $A$ to $B$ is $2$, while the distance from $A$ to $C$ is $5$.
 
 2. What will Dijkstra's algorithm declare as the shortest path to $C$, and what is its weight?
-   > *Your answer here*
 
-3. Look at the graph manually. What is the *actual* shortest path from $A$ to $C$, and what is its total weight? 
-   > *Your answer here*
+   > After visiting $B$, the algorithm examines the edge from $B$ to $C$, which has weight $-4$.
+   >
+   > The path is:
+   >
+   > $A \rightarrow B \rightarrow C$
+   >
+   > Its total weight is:
+   >
+   > $2 + (-4) = -2$
+   >
+   > Therefore, Dijkstra's algorithm declares the shortest path to $C$ to have weight $-2$.
+
+3. Look at the graph manually. What is the *actual* shortest path from $A$ to $C$, and what is its total weight?
+
+   > The actual shortest path is also:
+   >
+   > $A \rightarrow B \rightarrow C$
+   >
+   > Its total weight is $-2$.
 
 4. **The Trap:** Explain exactly *why* Dijkstra's algorithm failed to find the correct shortest path in this scenario.
-   > *Your answer here*
+
+   > With the graph and edge weights shown, Dijkstra's algorithm does not fail. The negative edge is encountered before Node $C$ is finalized, so the algorithm correctly updates the distance to $C$ from $5$ to $-2$.
+   >
+   > This graph therefore does not demonstrate the usual failure of Dijkstra's algorithm with negative edge weights. Dijkstra's algorithm can fail when a node is finalized too early, before a later negative edge provides a shorter path to it.
+   >
+   > For example, if the edge weights from $A$ were changed so that $A \rightarrow B$ had weight $5$ and $A \rightarrow C$ had weight $2$, then Dijkstra's algorithm would visit $C$ first and finalize its distance as $2$. However, the path $A \rightarrow B \rightarrow C$ would have total weight:
+   >
+   > $5 + (-4) = 1$
+   >
+   > In that modified graph, the algorithm would incorrectly keep the distance $2$ instead of finding the shorter distance $1$.
 
 ---
 
@@ -80,7 +119,8 @@ Trace Dijkstra's algorithm starting from Node $A$ to find the shortest path to N
 In the real world, problems rarely look like neat mathematical graphs right away. You often have to translate real-world constraints into a standard graph format so that an algorithm like Dijkstra's can process it.
 
 **The Scenario:**
-You are building a navigation app for delivery robots on a college campus. 
+
+You are building a navigation app for delivery robots on a college campus.
 
 * Moving between any two adjacent sidewalk intersections takes exactly $2$ minutes.
 
@@ -89,14 +129,21 @@ You are building a navigation app for delivery robots on a college campus.
 * Certain intersections are busy crosswalks. The robot must wait an additional $3$ minutes at these specific intersections before it can safely leave them and continue on its path.
 
 **The Problem:**
+
 Standard Dijkstra's algorithm only understands *edges* and *edge weights*. It does not natively understand "node weights" (like waiting at an intersection) or "impassable terrain".
 
 **Questions:**
 
 1. How should you represent the paths with stairs in your graph so the algorithm never tries to use them?
 
-   > *Your answer here*
+   > Do not add stair paths as edges in the graph. Only add edges that represent usable sidewalk paths. If a path contains stairs, it should be omitted or marked as impassable so that Dijkstra's algorithm cannot select it.
 
 2. How can you account for the $3$-minute waiting time at busy crosswalk intersections using *only* edge weights? (Hint: Think about how you could modify the weights of edges connecting to that intersection).
 
-   > *Your answer here*
+   > Add the $3$-minute waiting time to the weight of each edge that enters a busy crosswalk intersection, or equivalently to each edge leaving that intersection depending on when the waiting time is intended to occur.
+   >
+   > For example, a normal sidewalk edge takes $2$ minutes. If the destination intersection is a busy crosswalk, the corresponding edge should have weight:
+   >
+   > $2 + 3 = 5 \text{ minutes}$
+   >
+   > This allows Dijkstra's algorithm to account for the waiting time using only edge weights.
